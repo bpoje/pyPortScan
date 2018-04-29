@@ -57,7 +57,8 @@ except Exception as e:
 	raise e
 
 #atDate = datetime.now().strftime("%B %d, %Y %I:%M%p")
-atDate = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+#atDate = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+atDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 for remoteServer in remoteServers:
 	remoteServerIP  = socket.gethostbyname(remoteServer[0])
