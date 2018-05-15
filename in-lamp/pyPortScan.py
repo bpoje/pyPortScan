@@ -8,13 +8,29 @@ import sys
 from datetime import datetime
 import sqlite3
 import mysql.connector
+import argparse
+import json
 
-configMySQL = {
-	'user' : 'root',
-	'password' : 'pass',
-	'host' : '127.0.0.1',
-	'database' : 'portScan',
-}
+parser = argparse.ArgumentParser()
+parser.add_argument("idSet", help="An integer indicating a set.", type=int)
+args = parser.parse_args()
+idSet = args.idSet
+
+#configMySQL = {
+#	'user' : 'scan',
+#	'password' : '-Pass12345',
+#	'host' : '127.0.0.1',
+#	'database' : 'portScan',
+#}
+
+#Load MySQL settings from db.json file
+with open('db.json') as configMySQL_file:
+    configMySQL = json.load(configMySQL_file)
+print(configMySQL)
+#print(configMySQL['user'])
+
+
+
 
 # Clear the screen
 subprocess.call('clear', shell=True)
@@ -49,19 +65,20 @@ try:
 
 	cursor = cnx.cursor()
 
-	add_progInstance = ("INSERT INTO progInstance() VALUES ()")
+	#add_progInstance = ("INSERT INTO progInstance() VALUES ()")
 
 	# Insert new instance
-	cursor.execute(add_progInstance)
-	progInstance_no = cursor.lastrowid
+	#cursor.execute(add_progInstance)
+	#progInstance_no = cursor.lastrowid
 
-	print (progInstance_no)
+	#print (progInstance_no)
 
 	add_timestamp = ("INSERT INTO timestamp "
-					"(fkProgInstance, atDate) "
-					"VALUES (%s,%s)")
+					"(idSet, atDate) "
+					"VALUES (%s, %s)")
 
-	data_timestamp = (progInstance_no, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+	#data_timestamp = (progInstance_no, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+	data_timestamp = (idSet, datetime.now().strftime("%Y-%m-%d %H:%M:%S"),)
 
 	# Insert new timestamp
 	cursor.execute(add_timestamp, data_timestamp)
