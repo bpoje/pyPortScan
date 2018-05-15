@@ -13,37 +13,21 @@ import json
 
 #Command line argument parsing
 parser = argparse.ArgumentParser()
+parser.add_argument("hostFilename", help="File with json of hosts and ports to scan.", type=str)
 parser.add_argument("idSet", help="An integer indicating a set.", type=int)
 args = parser.parse_args()
 idSet = args.idSet
 
-#Load MySQL settings from db.json file
+#Load MySQL settings from json file
 with open('db.json') as configMySQL_file:
     configMySQL = json.load(configMySQL_file)
 
+#Load hosts and ports to scan from json file
+with open(args.hostFilename) as remoteServers_file:
+    remoteServers = json.load(remoteServers_file)
+
 # Clear the screen
 subprocess.call('clear', shell=True)
-
-remoteServers = (
-	("192.168.254.2",  "ZSSS1b"),
-	("192.168.254.3",  "ZSSSme"),
-	("192.168.254.4",  "ZSSS3c"),
-	("192.168.254.5",  "ZSSS2a"),
-	("192.168.254.7",  "ZSSS3a"),
-	("192.168.254.8",  "ZSSS3b"),
-	("192.168.254.9",  "ZSSS4a"),
-	("192.168.254.10", "ZSSS4b"),
-	("192.168.254.11", "ZSSS5a"),
-	("192.168.254.12", "ZSSS5b"),
-	("192.168.254.13", "ZSSS6a"),
-	("192.168.254.14", "ZSSS3d"),
-	("192.168.254.21", "ZSSS1d"),
-)
-
-ports = (
-	# (80,)
-	(80,443)
-)
 
 try:
 	cnx = mysql.connector.connect(**configMySQL)
@@ -136,6 +120,8 @@ try:
 		# Using the range function to specify ports (here it will scans all ports between 1 and 1024)
 		#for port in range(1,1025):
 		#for port in (80,443,8080):
+		ports = remoteServer[2]
+		print ports
 		for port in ports:
 			open = False
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
