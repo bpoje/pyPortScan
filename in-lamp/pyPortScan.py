@@ -11,33 +11,18 @@ import mysql.connector
 import argparse
 import json
 
+#Command line argument parsing
 parser = argparse.ArgumentParser()
 parser.add_argument("idSet", help="An integer indicating a set.", type=int)
 args = parser.parse_args()
 idSet = args.idSet
 
-#configMySQL = {
-#	'user' : 'scan',
-#	'password' : '-Pass12345',
-#	'host' : '127.0.0.1',
-#	'database' : 'portScan',
-#}
-
 #Load MySQL settings from db.json file
 with open('db.json') as configMySQL_file:
     configMySQL = json.load(configMySQL_file)
-print(configMySQL)
-#print(configMySQL['user'])
-
-
-
 
 # Clear the screen
 subprocess.call('clear', shell=True)
-
-# Ask for input
-#remoteServer    = raw_input("Enter a remote host to scan: ")
-#remoteServer	= "192.168.254.2"
 
 remoteServers = (
 	("192.168.254.2",  "ZSSS1b"),
@@ -73,6 +58,21 @@ try:
 
 	#print (progInstance_no)
 
+	#Any previous timestamps in set idSet?
+	query_timestamp = ("SELECT id FROM timestamp WHERE idSet = %s ORDER BY atDate DESC LIMIT 1")
+	data_timestamp = (idSet,)
+
+	cursor.execute(query_timestamp, data_timestamp)
+	row = cursor.fetchone()
+	print ("row")
+	print (row)
+
+	#If part of existing set, get id of last timestamp from set
+	previousTimestamp_no = None
+	if (row != None):
+		previousTimestamp_no = row[0]
+		print ("previous:", previousTimestamp_no)
+
 	add_timestamp = ("INSERT INTO timestamp "
 					"(idSet, atDate) "
 					"VALUES (%s, %s)")
@@ -85,6 +85,17 @@ try:
 	timestamp_no = cursor.lastrowid
 
 	print (timestamp_no)
+
+	#If part of existing set, update previous timestamp
+	if (previousTimestamp_no != None):
+		#Update previous timestamp
+		update_timestamp = ("UPDATE timestamp "
+							"SET idNext = %s "
+							"WHERE id = %s AND idSet = %s")
+
+		data_timestamp = (timestamp_no, previousTimestamp_no, idSet)
+
+		cursor.execute(update_timestamp, data_timestamp)
 
 	add_node = ("INSERT INTO node "
 				"(ip4, label) "
